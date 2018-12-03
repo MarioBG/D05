@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import repositories.CurriculumRepository;
 import domain.Curriculum;
 import domain.EducationRecord;
 import domain.EndorserRecord;
@@ -21,8 +22,8 @@ public class CurriculumService {
 
 	// Managed repository -----------------------------------------------------
 
-//	@Autowired
-//	private CurriculumRepository	curriculumRepository;
+	@Autowired
+	private CurriculumRepository	curriculumRepository;
 
 	// Supporting services ----------------------------------------------------
 

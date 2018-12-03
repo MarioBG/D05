@@ -41,8 +41,8 @@ import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import domain.DomainEntity;
 import utilities.DatabaseConfig;
+import domain.DomainEntity;
 
 public class DatabaseUtil {
 
