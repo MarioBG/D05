@@ -22,7 +22,6 @@ public class Complaint extends DomainEntity {
 	private Date				moment;
 	private String				description;
 	private Collection<String>	attachments;
-	private boolean selfAsigned;
 
 
 	@NotBlank
@@ -64,15 +63,5 @@ public class Complaint extends DomainEntity {
 	public void setAttachments(final Collection<String> attachments) {
 		this.attachments = attachments;
 	}
-
-	public boolean isSelfAsigned() {
-		return this.selfAsigned;
-	}
-
-	public void setSelfAsigned(boolean selfAsigned) {
-		this.selfAsigned = selfAsigned;
-	}
-	
-	
 
 }
