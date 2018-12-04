@@ -25,9 +25,6 @@ public class SponsorshipService {
 	private SponsorshipRepository	sponsorshipRepository;
 
 	@Autowired
-	private CreditCardService		creditCardService;
-
-	@Autowired
 	private SponsorService			sponsorService;
 
 
@@ -43,8 +40,6 @@ public class SponsorshipService {
 			saved = this.sponsorshipRepository.findOne(sponsorship.getId());
 			Assert.notNull(saved);
 		}
-
-		this.creditCardService.save(sponsorship.getCreditCard());
 
 		result = this.sponsorshipRepository.save(sponsorship);
 		Assert.notNull(result);
