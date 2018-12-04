@@ -18,6 +18,8 @@ public class Configuration extends DomainEntity {
 
 	private String				bannerURL;
 	private Collection<String>	spamWords;
+	private Collection<String>	badWords;
+	private Collection<String>	goodWords;
 	private double				VATTax;
 	private String				countryCode;
 	private Double				finderCached;
@@ -95,6 +97,24 @@ public class Configuration extends DomainEntity {
 
 	public void setDefaultCreditCards(final String defaultCreditCards) {
 		this.defaultCreditCards = defaultCreditCards;
+	}
+
+	@ElementCollection(targetClass = String.class)
+	public Collection<String> getBadWords() {
+		return this.badWords;
+	}
+
+	public void setBadWords(final Collection<String> badWords) {
+		this.badWords = badWords;
+	}
+
+	@ElementCollection(targetClass = String.class)
+	public Collection<String> getGoodWords() {
+		return this.goodWords;
+	}
+
+	public void setGoodWords(final Collection<String> goodWords) {
+		this.goodWords = goodWords;
 	}
 
 

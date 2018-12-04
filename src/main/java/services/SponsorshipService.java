@@ -38,13 +38,13 @@ public class SponsorshipService {
 		authority = new Authority();
 		authority.setAuthority(Authority.SPONSOR);
 		loggedUserAccount = LoginService.getPrincipal();
-
+		Assert.notNull(sponsorship.getCreditCard());
 		if (this.exists(sponsorship.getId()) && (loggedUserAccount.getAuthorities().contains(authority))) {
 			saved = this.sponsorshipRepository.findOne(sponsorship.getId());
 			Assert.notNull(saved);
 		}
 
-		Assert.notNull(this.creditCardService.save(sponsorship.getCreditCard()));
+		this.creditCardService.save(sponsorship.getCreditCard());
 
 		result = this.sponsorshipRepository.save(sponsorship);
 		Assert.notNull(result);
