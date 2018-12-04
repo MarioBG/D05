@@ -1,4 +1,5 @@
-package TestGenerator; 
+
+package TestGenerator;
 
 import java.util.Collection;
 
@@ -11,52 +12,86 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
 
-import domain.Endorsement;
+import services.CustomerService;
 import services.EndorsementService;
+import services.HandyWorkerService;
 import utilities.AbstractTest;
-@ContextConfiguration(locations = {"classpath:spring/junit.xml", "classpath:spring/datasource.xml", "classpath:spring/config/packages.xml"}) 
-@RunWith(SpringJUnit4ClassRunner.class) 
-@Transactional 
-public class EndorsementServiceTest extends AbstractTest { 
+import domain.Customer;
+import domain.Endorsement;
+import domain.HandyWorker;
 
-@Autowired 
-private EndorsementService	endorsementService; 
+@ContextConfiguration(locations = {
+	"classpath:spring/junit.xml", "classpath:spring/datasource.xml", "classpath:spring/config/packages.xml"
+})
+@RunWith(SpringJUnit4ClassRunner.class)
+@Transactional
+public class EndorsementServiceTest extends AbstractTest {
 
-@Test 
-public void saveEndorsementTest(){ 
-Endorsement endorsement, saved;
-Collection<Endorsement> endorsements;
-endorsement = endorsementService.findAll().iterator().next();
-endorsement.setVersion(57);
-saved = endorsementService.save(endorsement);
-endorsements = endorsementService.findAll();
-Assert.isTrue(endorsements.contains(saved));
-} 
+	@Autowired
+	private EndorsementService	endorsementService;
 
-@Test 
-public void findAllEndorsementTest() { 
-Collection<Endorsement> result; 
-result = endorsementService.findAll(); 
-Assert.notNull(result); 
-} 
+	@Autowired
+	private CustomerService		customerService;
 
-@Test 
-public void findOneEndorsementTest(){ 
-Endorsement endorsement = endorsementService.findAll().iterator().next(); 
-int endorsementId = endorsement.getId(); 
-Assert.isTrue(endorsementId != 0); 
-Endorsement result; 
-result = endorsementService.findOne(endorsementId); 
-Assert.notNull(result); 
-} 
+	@Autowired
+	private HandyWorkerService	handyWorkerService;
 
-@Test 
-public void deleteEndorsementTest() { 
-Endorsement endorsement = endorsementService.findAll().iterator().next(); 
-Assert.notNull(endorsement); 
-Assert.isTrue(endorsement.getId() != 0); 
-Assert.isTrue(this.endorsementService.exists(endorsement.getId())); 
-this.endorsementService.delete(endorsement); 
-} 
 
-} 
+	@Test
+	public void endorseAsCustomer() {
+		Endorsement endorsement, saved;
+		Collection<Endorsement> endorsements;
+		endorsement = new Endorsement();
+		final Customer c = this.customerService.findAll().iterator().next();
+		final HandyWorker h = this.handyWorkerService.findAll().iterator().next();
+		this.authenticate(c.getUserAccount().getUsername());
+		endorsement.setHandyWorker(h);
+		endorsement.setComment("Cosas cosos de chapuzas");
+		saved = this.endorsementService.save(endorsement);
+		endorsements = this.endorsementService.findAll();
+		Assert.isTrue(endorsements.contains(saved));
+	}
+
+	@Test
+	//TODO TransientObjectException (objeto sin guardar?)
+	public void endorseAsHandyWorker() {
+		Endorsement endorsement, saved;
+		Collection<Endorsement> endorsements;
+		endorsement = new Endorsement();
+		final Customer c = this.customerService.findAll().iterator().next();
+		final HandyWorker h = this.handyWorkerService.findAll().iterator().next();
+		this.authenticate(h.getUserAccount().getUsername());
+		endorsement.setCustomer(c);
+		endorsement.setComment("Cosas cosos de chapuzas");
+		saved = this.endorsementService.save(endorsement);
+		endorsements = this.endorsementService.findAll();
+		Assert.isTrue(endorsements.contains(saved));
+	}
+
+	@Test
+	public void findAllEndorsementTest() {
+		Collection<Endorsement> result;
+		result = this.endorsementService.findAll();
+		Assert.notNull(result);
+	}
+
+	@Test
+	public void findOneEndorsementTest() {
+		final Endorsement endorsement = this.endorsementService.findAll().iterator().next();
+		final int endorsementId = endorsement.getId();
+		Assert.isTrue(endorsementId != 0);
+		Endorsement result;
+		result = this.endorsementService.findOne(endorsementId);
+		Assert.notNull(result);
+	}
+
+	@Test
+	public void deleteEndorsementTest() {
+		final Endorsement endorsement = this.endorsementService.findAll().iterator().next();
+		Assert.notNull(endorsement);
+		Assert.isTrue(endorsement.getId() != 0);
+		Assert.isTrue(this.endorsementService.exists(endorsement.getId()));
+		this.endorsementService.delete(endorsement.getId());
+	}
+
+}
