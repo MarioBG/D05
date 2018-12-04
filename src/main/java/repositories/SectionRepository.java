@@ -10,7 +10,7 @@ import domain.Section;
 
 public interface SectionRepository extends JpaRepository<Section, Integer> {
 
-	@Query("select s from Section s order by s.number where s.tutorial.id = ?1")
+	@Query("select s from Tutorial t join t.sections s where t.id = ?1 order by s.number")
 	public List<Section> getSectionsOrderedFromTutorial(int tutorialId);
 
 }
