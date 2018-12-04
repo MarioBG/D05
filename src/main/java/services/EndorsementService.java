@@ -92,6 +92,7 @@ public class EndorsementService {
 
 	public void delete(final Integer id) {
 		Assert.notNull(id);
+		Assert.notNull(this.endorsementRepository.findOne(id));
 		final UserAccount logedUserAccount = LoginService.getPrincipal();
 		final Authority authority = new Authority();
 		authority.setAuthority(Authority.CUSTOMER);

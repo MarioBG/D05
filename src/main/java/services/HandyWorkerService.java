@@ -108,7 +108,7 @@ public class HandyWorkerService {
 
 	public void addToHandyWorkerEndorsements(final HandyWorker handyWorker, final Endorsement e) {
 		final Authority authority = new Authority();
-		authority.setAuthority(Authority.CUSTOMER);
+		authority.setAuthority(Authority.HANDYWORKER);
 		Assert.notNull(handyWorker, "handy.worker.not.null");
 		Assert.notNull(e, "handy.worker.endorsement.not.null");
 		final UserAccount logedUserAccount = LoginService.getPrincipal();
