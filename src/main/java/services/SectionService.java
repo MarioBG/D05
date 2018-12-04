@@ -51,7 +51,7 @@ public class SectionService {
 		return res;
 	}
 
-	public Section save(final Section c) {
+	public Section save(Section c) {
 		Section res;
 		res = this.sectionRepository.save(c);
 		return res;
@@ -61,10 +61,12 @@ public class SectionService {
 		return this.sectionRepository.exists(id);
 	}
 
-	public void delete(final Iterable<Section> sections) {
+	public void delete(Collection<Section> sections) {
 		Assert.notNull(sections);
-		for (final Section section : sections)
-			this.sectionRepository.delete(section);
+		if (sections.size() > 0)
+			for (Section section : sections)
+				this.sectionRepository.delete(section);
+		sections = null;
 	}
 
 	//Other Business
