@@ -78,7 +78,8 @@ public class TutorialService {
 		loggedUserAccount = LoginService.getPrincipal();
 		Assert.isTrue(loggedUserAccount.getAuthorities().contains(authority));
 		Assert.isTrue(this.handyWorkerService.findByPrincipal().getTutorials().contains(entity));
-		this.sectionService.delete(entity.getSections());
+		final Collection<Section> sections = this.sectionService.getSectionsOrderedFromTutorial(entity.getId());
+		this.sectionService.delete(sections);
 		this.tutorialRepository.delete(entity);
 	}
 
