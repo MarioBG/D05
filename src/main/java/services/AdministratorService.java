@@ -24,6 +24,7 @@ import security.UserAccount;
 import domain.Actor;
 import domain.Administrator;
 import domain.Box;
+import domain.Configuration;
 import domain.Customer;
 import domain.Endorsement;
 import domain.HandyWorker;
@@ -44,6 +45,9 @@ public class AdministratorService {
 
 	@Autowired
 	private CustomerService			customerService;
+
+	@Autowired
+	private ConfigurationService	configurationService;
 
 	@Autowired
 	private HandyWorkerService		handyWorkerService;
@@ -168,8 +172,21 @@ public class AdministratorService {
 
 	public Map<Customer, Double> calculateCustomerScore() {
 
-		final Pattern badPattern = Pattern.compile("");										//TODO bad words y good words
-		final Pattern goodPattern = Pattern.compile("");
+		Configuration conf = this.configurationService.findConfiguration();
+		Collection<String> badWords = conf.getBadWords();
+		Collection<String> goodWords = conf.getGoodWords();
+		String badPatternString = "^";
+		String goodPatternString = "^";
+		for (String word : badWords)
+			badPatternString += (word + "|");
+		for (String word : goodWords)
+			goodPatternString += (word + "|");
+		badPatternString = badPatternString.substring(0, badPatternString.length() - 2);
+		badPatternString += "$";
+		goodPatternString = goodPatternString.substring(0, goodPatternString.length() - 2);
+		goodPatternString += "$";
+		final Pattern badPattern = Pattern.compile(badPatternString);										//TODO bad words y good words
+		final Pattern goodPattern = Pattern.compile(goodPatternString);
 		Matcher good, bad = null;
 		final Map<Customer, Double> ans = new HashMap<Customer, Double>();
 		for (final Customer c : this.customerService.findAll()) {

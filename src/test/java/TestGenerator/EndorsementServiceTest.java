@@ -48,6 +48,9 @@ public class EndorsementServiceTest extends AbstractTest {
 		endorsement.setHandyWorker(h);
 		endorsement.setComment("Cosas cosos de chapuzas");
 		saved = this.endorsementService.save(endorsement);
+		System.out.println(saved);
+		System.out.println(saved.getCustomer());
+		System.out.println(saved.getHandyWorker());
 		endorsements = this.endorsementService.findAll();
 		Assert.isTrue(endorsements.contains(saved));
 	}
@@ -67,7 +70,6 @@ public class EndorsementServiceTest extends AbstractTest {
 		endorsements = this.endorsementService.findAll();
 		Assert.isTrue(endorsements.contains(saved));
 	}
-
 	@Test
 	public void findAllEndorsementTest() {
 		Collection<Endorsement> result;
