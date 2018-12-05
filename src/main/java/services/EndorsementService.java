@@ -41,6 +41,7 @@ public class EndorsementService {
 
 	public Endorsement save(final Endorsement entity) {
 		Assert.notNull(entity);
+		Endorsement saved = null;
 		UserAccount logedUserAccount;
 		logedUserAccount = LoginService.getPrincipal();
 		final Authority authority = new Authority();
@@ -54,15 +55,17 @@ public class EndorsementService {
 				Assert.notNull(entity.getHandyWorker());
 				Assert.notNull(this.handyWorkerService.findByUserAccountId(entity.getHandyWorker().getUserAccount().getId()));
 				final Customer c = this.customerService.findByPrincipal();
-				this.customerService.addToCustomerEndorsements(c, entity);
+				saved = this.endorsementRepository.save(entity);
+				this.customerService.addToCustomerEndorsements(c, saved);
 			} else {
 				Assert.notNull(entity.getCustomer());
 				Assert.notNull(this.customerService.findByUserAccountId(entity.getCustomer().getUserAccount().getId()));
 				final HandyWorker c = this.handyWorkerService.findByPrincipal();
-				this.handyWorkerService.addToHandyWorkerEndorsements(c, entity);
+				saved = this.endorsementRepository.save(entity);
+				this.handyWorkerService.addToHandyWorkerEndorsements(c, saved);
 			}
 		}
-		return this.endorsementRepository.save(entity);
+		return saved;
 	}
 	public Endorsement findOne(final Integer id) {
 		Assert.notNull(id);
@@ -104,6 +107,10 @@ public class EndorsementService {
 
 	public List<Endorsement> findAll() {
 		return this.endorsementRepository.findAll();
+	}
+
+	public void flush() {
+		this.endorsementRepository.flush();
 	}
 
 }
