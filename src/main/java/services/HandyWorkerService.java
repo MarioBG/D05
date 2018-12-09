@@ -229,6 +229,17 @@ public class HandyWorkerService {
 		return res;
 	}
 
+	public HandyWorker findByPrincipal() {
+		HandyWorker res;
+		UserAccount userAccount;
+		userAccount = LoginService.getPrincipal();
+		if (userAccount == null)
+			res = null;
+		else
+			res = this.handyWorkerRepository.findByUserAccountId(userAccount.getId());
+		return res;
+	}
+
 	public HandyWorker findHandyWorkerByApplication(Application application) {
 		HandyWorker res;
 		Assert.notNull(application);
@@ -338,4 +349,42 @@ public class HandyWorkerService {
 		Collection<HandyWorker> res = this.handyWorkerRepository.handyWorkersWith10PercentMoreAvgApplicatios();
 		return res;
 	}
+
+	public Collection<HandyWorker> topThreeHandyWorkersInTermsOfComplaints() {
+		Collection<HandyWorker> aux = handyWorkerRepository.topThreeHandyWorkersInTermsOfComplaints();
+		Assert.notNull(aux);
+		Collection<HandyWorker> res = new LinkedList<HandyWorker>();
+		for (int i = 0; i < 3; i++) {
+			HandyWorker handyWorker = aux.iterator().next();
+			aux.remove(handyWorker);
+			res.add(handyWorker);
+		}
+		return res;
+	}
+
+	public Collection<HandyWorker> findByCustomerUserAccountId(final int id) {
+		return this.handyWorkerRepository.handyWorkersWorkedForCustomerWithUserAccountId(id);
+	}
+
+	public HandyWorker findByUserAccountId(final int id) {
+		return this.handyWorkerRepository.findByUserAccountId(id);
+	}
+
+	public void addToHandyWorkerEndorsements(final HandyWorker handyWorker, final Endorsement e) {
+		final Authority authority = new Authority();
+		authority.setAuthority(Authority.HANDYWORKER);
+		Assert.notNull(handyWorker, "handy.worker.not.null");
+		Assert.notNull(e, "handy.worker.endorsement.not.null");
+		final UserAccount logedUserAccount = LoginService.getPrincipal();
+		Assert.notNull(logedUserAccount, "handy.worker.notLogged");
+		Assert.isTrue(logedUserAccount.getAuthorities().contains(authority));
+		final Customer customer = this.customerService.findByUserAccountId(e.getCustomer().getUserAccount().getId());
+		Assert.isTrue(this.customerService.findByHandyWorkerUserAccountId(handyWorker.getUserAccount().getId())
+				.contains(customer));
+		final Collection<Endorsement> endorsements = handyWorker.getEndorsements();
+		endorsements.add(e);
+		handyWorker.setEndorsements(endorsements);
+		this.handyWorkerRepository.save(handyWorker);
+	}
+
 }

@@ -7,6 +7,7 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Past;
@@ -71,6 +72,19 @@ public class Complaint extends DomainEntity {
 
 	public void setSelfAsigned(boolean selfAsigned) {
 		this.selfAsigned = selfAsigned;
+	}
+	
+	// Relationships ----------------------------------------------------------
+	
+	private Report report;
+
+	@ManyToOne(optional=true)
+	public Report getReport() {
+		return this.report;
+	}
+
+	public void setReport(Report report) {
+		this.report = report;
 	}
 	
 	

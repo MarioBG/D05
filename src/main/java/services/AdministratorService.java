@@ -1,9 +1,15 @@
 
 package services;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
@@ -17,6 +23,7 @@ import domain.Box;
 import domain.Category;
 import domain.Configuration;
 import domain.Customer;
+import domain.Endorsement;
 import domain.HandyWorker;
 import domain.Message;
 import domain.Referee;
@@ -35,52 +42,54 @@ public class AdministratorService {
 	// Managed repository -----------------------------------------------------
 
 	@Autowired
-	private AdministratorRepository	administratorRepository;
+	private AdministratorRepository administratorRepository;
 
 	// Supporting services ----------------------------------------------------
-	
+
 	@Autowired
-	private ActorService			actorservice;
-	
+	private ActorService actorservice;
+
 	@Autowired
 	LoginService loginservice;
-	
+
 	@Autowired
 	private MessageService messageservice;
-	
+
 	@Autowired
 	private WarrantyService warrantyService;
-	
+
 	@Autowired
 	private CategoryService categoryService;
-	
+
 	@Autowired
 	private FixUpTaskService fixUpTaskService;
-	
+
 	@Autowired
 	private ApplicationService applicationService;
-	
+
 	@Autowired
 	private CustomerService customerService;
-	
+
 	@Autowired
 	private HandyWorkerService handyWorkerService;
-	
+
 	@Autowired
 	private RefereeService refereeService;
-	
+
 	@Autowired
 	private SponsorService sponsorService;
-	
+
 	@Autowired
 	private ConfigurationService configurationService;
 
+	@Autowired
+	private EndorsementService endorsementService;
 
 	// Simple CRUD methods ----------------------------------------------------
-	
+
 	public void sendAll(Message message) {
 		Assert.notNull(message);
-		
+
 		Actor self = actorservice.findSelf();
 		messageservice.sendMessage(actorservice.findAllUsername(self.getId()), message);
 	}
@@ -130,16 +139,23 @@ public class AdministratorService {
 		if (this.exists(administrator.getId())) {
 			logedUserAccount = LoginService.getPrincipal();
 			Assert.notNull(logedUserAccount, "administrator.notLogged ");
-			Assert.isTrue(logedUserAccount.equals(administrator.getUserAccount()), "administrator.notEqual.userAccount");
+			Assert.isTrue(logedUserAccount.equals(administrator.getUserAccount()),
+					"administrator.notEqual.userAccount");
 			saved = this.administratorRepository.findOne(administrator.getId());
 			Assert.notNull(saved, "administrator.not.null");
-			Assert.isTrue(saved.getUserAccount().getUsername().equals(administrator.getUserAccount().getUsername()), "administrator.notEqual.username");
-			Assert.isTrue(administrator.getUserAccount().getPassword().equals(saved.getUserAccount().getPassword()), "administrator.notEqual.password");
-			Assert.isTrue(administrator.getUserAccount().isAccountNonLocked() == saved.getUserAccount().isAccountNonLocked() && administrator.isSuspicious() == saved.isSuspicious(), "administrator.notEqual.accountOrSuspicious");
+			Assert.isTrue(saved.getUserAccount().getUsername().equals(administrator.getUserAccount().getUsername()),
+					"administrator.notEqual.username");
+			Assert.isTrue(administrator.getUserAccount().getPassword().equals(saved.getUserAccount().getPassword()),
+					"administrator.notEqual.password");
+			Assert.isTrue(
+					administrator.getUserAccount().isAccountNonLocked() == saved.getUserAccount().isAccountNonLocked()
+							&& administrator.isSuspicious() == saved.isSuspicious(),
+					"administrator.notEqual.accountOrSuspicious");
 
 		} else {
 			Assert.isTrue(administrator.isSuspicious() == false, "administrator.notSuspicious.false");
-			administrator.getUserAccount().setPassword(encoder.encodePassword(administrator.getUserAccount().getPassword(), null));
+			administrator.getUserAccount()
+					.setPassword(encoder.encodePassword(administrator.getUserAccount().getPassword(), null));
 			administrator.getUserAccount().setEnabled(true);
 			Collection<Message> messages = new LinkedList<>();
 			Box inbox = new Box();
@@ -204,14 +220,14 @@ public class AdministratorService {
 		Assert.isTrue(this.administratorRepository.exists(administrator.getId()));
 		this.administratorRepository.delete(administrator);
 	}
-	
+
 	public UserAccount changeEnabledActor(UserAccount userAccount) {
 		Assert.notNull(userAccount);
-		
+		Assert.isTrue(actorservice.isSuspicious(actorservice.findByUserAccount(userAccount)));
 		userAccount.setEnabled(!userAccount.isEnabled());
 		return this.loginservice.save(userAccount);
 	}
-	
+
 	public Warranty saveWarranty(Warranty warranty) {
 		Warranty result, saved;
 		UserAccount logedUserAccount;
@@ -219,15 +235,16 @@ public class AdministratorService {
 		authority = new Authority();
 		authority.setAuthority("ADMINISTRATOR");
 		logedUserAccount = LoginService.getPrincipal();
-		
-		if(exists(warranty.getId()) && logedUserAccount.getAuthorities().contains(authority) && !warranty.isFinalMode()) {
+
+		if (exists(warranty.getId()) && logedUserAccount.getAuthorities().contains(authority)
+				&& !warranty.isFinalMode()) {
 			saved = this.warrantyService.findOne(warranty.getId());
 			Assert.notNull(saved);
 			result = this.warrantyService.save(warranty);
 			Assert.notNull(result);
 			return result;
 		}
-		
+
 		result = this.warrantyService.findOne(warranty.getId());
 		return result;
 	}
@@ -270,15 +287,15 @@ public class AdministratorService {
 		authority = new Authority();
 		authority.setAuthority("ADMINISTRATOR");
 		logedUserAccount = LoginService.getPrincipal();
-		
-		if(exists(category.getId()) && logedUserAccount.getAuthorities().contains(authority)) {
+
+		if (exists(category.getId()) && logedUserAccount.getAuthorities().contains(authority)) {
 			saved = this.categoryService.findOne(category.getId());
 			Assert.notNull(saved);
 			result = this.categoryService.save(category);
 			Assert.notNull(result);
 			return result;
 		}
-		
+
 		result = this.categoryService.findOne(category.getId());
 		return result;
 	}
@@ -307,7 +324,7 @@ public class AdministratorService {
 	public void deleteCategory(Category category) {
 		Assert.notNull(category);
 		Assert.isTrue(exists(category.getId()));
-		
+
 		UserAccount logedUserAccount;
 		Authority authority;
 		authority = new Authority();
@@ -316,52 +333,52 @@ public class AdministratorService {
 		Assert.isTrue(logedUserAccount.getAuthorities().contains(authority));
 		categoryService.delete(category);
 	}
-	
+
 	public Collection<Double> findAvgMinMaxStdDvtFixUpTasksPerUser() {
 		Collection<Double> res = fixUpTaskService.findAvgMinMaxStdDvtFixUpTasksPerUser();
 		return res;
 	}
-	
+
 	public Collection<Double> findAvgMinMaxStrDvtApplicationPerFixUpTask() {
 		Collection<Double> res = applicationService.findAvgMinMaxStrDvtApplicationPerFixUpTask();
 		return res;
 	}
-	
+
 	public Collection<Double> findAvgMinMaxStrDvtPerFixUpTask() {
 		Collection<Double> res = fixUpTaskService.findAvgMinMaxStrDvtPerFixUpTask();
 		return res;
 	}
-	
+
 	public Collection<Double> findAvgMinMaxStrDvtPerApplication() {
 		Collection<Double> res = applicationService.findAvgMinMaxStrDvtPerApplication();
 		return res;
 	}
-	
+
 	public Double ratioOfPendingApplications() {
 		Double res = this.applicationService.ratioOfPendingApplications();
 		return res;
 	}
-	
+
 	public Double ratioOfAcceptedApplications() {
 		Double res = this.applicationService.ratioOfAcceptedApplications();
 		return res;
 	}
-	
+
 	public Double ratioOfRejectedApplications() {
 		Double res = this.applicationService.ratioOfRejectedApplications();
 		return res;
 	}
-	
+
 	public Double ratioOfRejectedApplicationsCantChange() {
 		Double res = this.applicationService.ratioOfRejectedApplicationsCantChange();
 		return res;
 	}
-	
+
 	public Collection<Customer> customersWith10PercentMoreAvgFixUpTask() {
 		Collection<Customer> res = this.customerService.customersWith10PercentMoreAvgFixUpTask();
 		return res;
 	}
-	
+
 	public Collection<HandyWorker> handyWorkersWith10PercentMoreAvgApplicatios() {
 		Collection<HandyWorker> res = this.handyWorkerService.handyWorkersWith10PercentMoreAvgApplicatios();
 		return res;
@@ -387,9 +404,12 @@ public class AdministratorService {
 			Assert.isTrue(logedUserAccount.equals(sponsor.getUserAccount()), "sponsor.notEqual.userAccount");
 			saved = this.sponsorService.findOne(sponsor.getId());
 			Assert.notNull(saved, "referee.not.null");
-			Assert.isTrue(saved.getUserAccount().getUsername().equals(sponsor.getUserAccount().getUsername()), "sponsor.notEqual.username");
-			Assert.isTrue(sponsor.getUserAccount().getPassword().equals(saved.getUserAccount().getPassword()), "sponsor.notEqual.password");
-			Assert.isTrue(sponsor.getUserAccount().isAccountNonLocked() == saved.getUserAccount().isAccountNonLocked() && sponsor.isSuspicious() == saved.isSuspicious(), "referee.notEqual.accountOrSuspicious");
+			Assert.isTrue(saved.getUserAccount().getUsername().equals(sponsor.getUserAccount().getUsername()),
+					"sponsor.notEqual.username");
+			Assert.isTrue(sponsor.getUserAccount().getPassword().equals(saved.getUserAccount().getPassword()),
+					"sponsor.notEqual.password");
+			Assert.isTrue(sponsor.getUserAccount().isAccountNonLocked() == saved.getUserAccount().isAccountNonLocked()
+					&& sponsor.isSuspicious() == saved.isSuspicious(), "referee.notEqual.accountOrSuspicious");
 
 		} else {
 			logedUserAccount = LoginService.getPrincipal();
@@ -429,7 +449,7 @@ public class AdministratorService {
 		return result;
 
 	}
-	
+
 	public Referee saveReferee(final Referee referee) {
 		Referee result, saved;
 		final UserAccount logedUserAccount;
@@ -450,9 +470,12 @@ public class AdministratorService {
 			Assert.isTrue(logedUserAccount.equals(referee.getUserAccount()), "referee.notEqual.userAccount");
 			saved = this.refereeService.findOne(referee.getId());
 			Assert.notNull(saved, "referee.not.null");
-			Assert.isTrue(saved.getUserAccount().getUsername().equals(referee.getUserAccount().getUsername()), "referee.notEqual.username");
-			Assert.isTrue(referee.getUserAccount().getPassword().equals(saved.getUserAccount().getPassword()), "referee.notEqual.password");
-			Assert.isTrue(referee.getUserAccount().isAccountNonLocked() == saved.getUserAccount().isAccountNonLocked() && referee.isSuspicious() == saved.isSuspicious(), "referee.notEqual.accountOrSuspicious");
+			Assert.isTrue(saved.getUserAccount().getUsername().equals(referee.getUserAccount().getUsername()),
+					"referee.notEqual.username");
+			Assert.isTrue(referee.getUserAccount().getPassword().equals(saved.getUserAccount().getPassword()),
+					"referee.notEqual.password");
+			Assert.isTrue(referee.getUserAccount().isAccountNonLocked() == saved.getUserAccount().isAccountNonLocked()
+					&& referee.isSuspicious() == saved.isSuspicious(), "referee.notEqual.accountOrSuspicious");
 
 		} else {
 			logedUserAccount = LoginService.getPrincipal();
@@ -492,12 +515,75 @@ public class AdministratorService {
 		return result;
 
 	}
-	
+
 	public Configuration saveConfiguration(Configuration configuration) {
 		Assert.notNull(configuration);
 		Assert.isTrue(configurationService.exists(configuration.getId()));
 		Configuration saved = configurationService.save(configuration);
 		Assert.notNull(saved);
 		return saved;
+	}
+
+	public Map<Customer, Double> calculateCustomerScore() {
+
+		Configuration conf = this.configurationService.findConfiguration();
+		Collection<String> badWords = conf.getBadWords();
+		Collection<String> goodWords = conf.getGoodWords();
+		String badPatternString = "^";
+		String goodPatternString = "^";
+		for (String word : badWords)
+			badPatternString += (word + "|");
+		for (String word : goodWords)
+			goodPatternString += (word + "|");
+		badPatternString = badPatternString.substring(0, badPatternString.length() - 2);
+		badPatternString += "$";
+		goodPatternString = goodPatternString.substring(0, goodPatternString.length() - 2);
+		goodPatternString += "$";
+		final Pattern badPattern = Pattern.compile(badPatternString); // TODO bad words y good words
+		final Pattern goodPattern = Pattern.compile(goodPatternString);
+		Matcher good, bad = null;
+		final Map<Customer, Double> ans = new HashMap<Customer, Double>();
+		for (final Customer c : this.customerService.findAll()) {
+			Double score = 0d;
+			for (final Endorsement e : this.endorsementService.findAll())
+				if (e.getCustomer() != null && e.getCustomer().equals(c)) {
+					good = goodPattern.matcher(e.getComment());
+					bad = badPattern.matcher(e.getComment());
+					while (good.find())
+						score++;
+					while (bad.find())
+						score--;
+				}
+		}
+		final List<Double> values = new ArrayList<Double>(ans.values());
+		Collections.sort(values);
+		for (final Customer c : ans.keySet())
+			ans.put(c, (-1 + ((ans.get(c) - values.get(0)) * (2))) / (values.get(values.size() - 1) - values.get(0)));
+		return ans;
+	}
+
+	public Map<HandyWorker, Double> calculateHandyWorkerScore() {
+
+		final Pattern badPattern = Pattern.compile(""); // TODO bad words y good words
+		final Pattern goodPattern = Pattern.compile("");
+		Matcher good, bad = null;
+		final Map<HandyWorker, Double> ans = new HashMap<HandyWorker, Double>();
+		for (final HandyWorker c : this.handyWorkerService.findAll()) {
+			Double score = 0d;
+			for (final Endorsement e : this.endorsementService.findAll())
+				if (e.getCustomer() != null && e.getCustomer().equals(c)) {
+					good = goodPattern.matcher(e.getComment());
+					bad = badPattern.matcher(e.getComment());
+					while (good.find())
+						score++;
+					while (bad.find())
+						score--;
+				}
+		}
+		final List<Double> values = new ArrayList<Double>(ans.values());
+		Collections.sort(values);
+		for (final HandyWorker c : ans.keySet())
+			ans.put(c, (-1 + ((ans.get(c) - values.get(0)) * (2))) / (values.get(values.size() - 1) - values.get(0)));
+		return ans;
 	}
 }

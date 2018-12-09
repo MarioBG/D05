@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import domain.Complaint;
+import domain.HandyWorker;
 import domain.Referee;
 import repositories.ComplaintRepository;
 import security.Authority;
@@ -109,6 +110,20 @@ public class ComplaintService {
 		res = this.complaintRepository.findSelfAsignedComplaintsByRefereeId(r.getId());
 		return res;
 		
+	}
+	
+	public Double[] computeAvgMinMaxStdvComplaintsPerFixUpTask() {
+		Double[] res = complaintRepository.computeAvgMinMaxStdvComplaintsPerFixUpTask();
+		Assert.notNull(res);
+		return res;
+	}
+	
+	public Collection<Complaint> findAcceptedHandyWorkerComplaintsByHandyWorker(HandyWorker handyWorker){
+		Assert.notNull(handyWorker);
+		Assert.isTrue(handyWorker.getId()!=0);
+		Collection<Complaint> res = complaintRepository.findAcceptedHandyWorkerComplaintsByHandyWorkerId(handyWorker.getId());
+		Assert.notEmpty(res);
+		return res;
 	}
 
 }

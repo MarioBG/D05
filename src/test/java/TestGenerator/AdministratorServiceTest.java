@@ -12,19 +12,22 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
 
+import domain.Actor;
 import domain.Administrator;
 import domain.Category;
 import domain.Configuration;
-import domain.Customer;
+import domain.HandyWorker;
 import domain.Referee;
 import domain.Sponsor;
 import domain.Warranty;
 import security.UserAccount;
+import security.UserAccountService;
+import services.ActorService;
 import services.AdministratorService;
 import services.CategoryService;
 import services.ConfigurationService;
-import services.CustomerService;
 import services.FixUpTaskService;
+import services.HandyWorkerService;
 import services.RefereeService;
 import services.SponsorService;
 import services.WarrantyService;
@@ -39,9 +42,6 @@ public class AdministratorServiceTest extends AbstractTest {
 
 	@Autowired
 	private AdministratorService	administratorService;
-	
-	@Autowired
-	private CustomerService	customerService;
 
 	@Autowired
 	private WarrantyService warrantyService;
@@ -60,6 +60,15 @@ public class AdministratorServiceTest extends AbstractTest {
 	
 	@Autowired
 	private ConfigurationService configurationService;
+	
+	@Autowired
+	private UserAccountService userAccountService;
+	
+	@Autowired
+	private HandyWorkerService handyWorkerService;
+	
+	@Autowired
+	private ActorService actorService;
 
 
 	@Test
@@ -120,13 +129,34 @@ public class AdministratorServiceTest extends AbstractTest {
 	
 	@Test
 	public void testChangeEnabledActor() {
-		Customer customer = customerService.findAll().iterator().next();
+		UserAccount userAccount = userAccountService.findUserAccountByUsername("useracount15");
+		Assert.notNull(userAccount);
+		HandyWorker handyWorker = handyWorkerService.findHandyWorkerByUserAccount(userAccount);
+		Assert.notNull(handyWorker);
 		
-		boolean isEnabled = customer.getUserAccount().isEnabled();
-		
-		UserAccount account = this.administratorService.changeEnabledActor(customer.getUserAccount());
+		boolean res = actorService.isSuspicious(handyWorker);
+		Assert.isTrue(res == true);
+		UserAccount account = this.administratorService.changeEnabledActor(handyWorker.getUserAccount());
 
-		Assert.isTrue(isEnabled != account.isEnabled());
+		Assert.isTrue(account.isEnabled()==false);
+	}
+	
+	@Test
+	public void testChangeEnabledActor2() {
+		UserAccount userAccount = userAccountService.findUserAccountByUsername("useracount15");
+		Assert.notNull(userAccount);
+		HandyWorker handyWorker = handyWorkerService.findHandyWorkerByUserAccount(userAccount);
+		Assert.notNull(handyWorker);
+		
+		boolean res = actorService.isSuspicious(handyWorker);
+		Assert.isTrue(res == true);
+		UserAccount account = this.administratorService.changeEnabledActor(handyWorker.getUserAccount());
+
+		Assert.isTrue(account.isEnabled()==false);
+		
+		account = this.administratorService.changeEnabledActor(handyWorker.getUserAccount());
+
+		Assert.isTrue(account.isEnabled()==true);
 	}
 
 	private Administrator copyAdministrator(final Administrator administrator) {
@@ -305,6 +335,7 @@ public class AdministratorServiceTest extends AbstractTest {
 		Assert.isTrue(saved.getName().equals("TestSponsor"));
 	}
 
+	@Test
 	public void saveConfigurationTest() {
 		Configuration res = configurationService.findAll().iterator().next();
 		Assert.isTrue(res.getId() != 0);
@@ -312,6 +343,13 @@ public class AdministratorServiceTest extends AbstractTest {
 		res.getSpamWords().add("prueba");
 		Configuration saved = configurationService.save(res);
 		Assert.isTrue(saved.getSpamWords().contains("prueba"));
+	}
+	
+	@Test
+	public void findAllSuspisiousActors() {
+		Collection<Actor> res = actorService.findAllSuspisiousActors();
+		Assert.notNull(res);
+		
 	}
 
 }

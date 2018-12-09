@@ -17,12 +17,14 @@ import domain.Complaint;
 import domain.CreditCard;
 import domain.Customer;
 import domain.FixUpTask;
+import domain.Note;
 import domain.Report;
 import security.LoginService;
 import services.ApplicationService;
 import services.ComplaintService;
 import services.CustomerService;
 import services.FixUpTaskService;
+import services.NoteService;
 import services.ReportService;
 import utilities.AbstractTest;
 
@@ -48,8 +50,8 @@ public class CustomerServiceTest extends AbstractTest {
 	@Autowired
 	private ReportService reportService;
 
-//	@Autowired
-//	private NoteService noteService;
+	@Autowired
+	private NoteService noteService;
 
 	@Test
 	public void saveCustomerTest() {
@@ -239,15 +241,57 @@ public class CustomerServiceTest extends AbstractTest {
 		Collection<Customer> res = this.customerService.customersWith10PercentMoreAvgFixUpTask();
 		Assert.notNull(res);
 	}
-//	
+	
+	@Test
+	public void saveNoteTest1() {
+		Note note = noteService.findAll().iterator().next();
+		Note newNote = new Note();
+		newNote.setComments(note.getComments());
+		newNote.setActor(note.getActor());
+		newNote.setCreatorComment("Prueba");
+		newNote.setMoment(note.getMoment());
+		newNote.setId(note.getId());
+		newNote.setVersion(note.getVersion());
+		this.authenticate("customer2");
+		Customer customer = customerService.findCustomerByUserAccount(LoginService.getPrincipal());
+		Collection<Report> rep = reportService.findReportsByCustomer(customer);
+		Report report = rep.iterator().next();
+		Report saved = customerService.saveNote(newNote, report, null);
+		Assert.notNull(saved);
+		Assert.isTrue(saved.getNotes().contains(newNote));
+	}
+	
+	@Test
+	public void saveNoteTest2() {
+		this.authenticate("customer2");
+		Customer customer = customerService.findCustomerByUserAccount(LoginService.getPrincipal());
+		Collection<Report> rep = reportService.findReportsByCustomer(customer);
+		Report report = rep.iterator().next();
+		Note note = report.getNotes().iterator().next();
+		String comment = "Pureba";
+		Report saved = customerService.saveNote(note, report, comment);
+		Assert.notNull(saved);
+		Assert.isTrue(saved.getNotes().contains(note));
+		Assert.isTrue(note.getComments().contains(LoginService.getPrincipal().getUsername() + ": -" + comment));
+	}
+	
+	@Test
+	public void topThreeCustomersInTermsOfComplaintsTest() {
+		Collection<Customer> customers = customerService.topThreeCustomersInTermsOfComplaints();
+		Assert.isTrue(customers.size()==3);
+	}
+	
+	
 //	@Test
-//	public void saveNoteTest() {
+//	public void saveNoteTest1() {
 //		Note note = noteService.findAll().iterator().next();
 //		this.authenticate("customer2");
 //		Customer customer = customerService.findCustomerByUserAccount(LoginService.getPrincipal());
-//		Collection<Report> rep = reportService.findReportByCustomerUserAccount(customer.getUserAccount());
+//		Collection<Report> rep = reportService.findReportsByCustomer(customer);
 //		Report report = rep.iterator().next();
-//		Note saved = customerService.saveNote(note, report);
+//		String comment = "Test Comment";
+//		Note saved = customerService.saveNote(note, report, comment);
 //		Assert.notNull(saved);
+//		Assert.isTrue(saved.getComments().contains(LoginService.getPrincipal().getUsername() + ": -" + comment));
 //	}
 }

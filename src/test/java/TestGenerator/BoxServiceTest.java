@@ -37,7 +37,6 @@ public class BoxServiceTest extends AbstractTest {
 		this.authenticate(sender.getUserAccount().getUsername());
 		
 		Box auxbox = new Box();
-		auxbox.setChildren(new LinkedList<Box>());
 		auxbox.setMessages(new LinkedList<Message>());
 		auxbox.setName("AUXBOX");
 		auxbox.setPredefined(false);

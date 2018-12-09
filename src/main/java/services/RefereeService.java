@@ -12,6 +12,7 @@ import org.springframework.util.Assert;
 
 import domain.Box;
 import domain.Complaint;
+import domain.Note;
 import domain.Referee;
 import domain.Report;
 import domain.SocialIdentity;
@@ -27,10 +28,13 @@ public class RefereeService {
 	// Managed repository -----------------------------------------------------
 
 	@Autowired
-	private RefereeRepository	refereeRepository;
-	
+	private RefereeRepository refereeRepository;
+
 	@Autowired
 	private ReportService reportService;
+	
+	@Autowired
+	private NoteService noteservice;
 
 	public Referee save(Referee entity) {
 		return refereeRepository.save(entity);
@@ -51,7 +55,7 @@ public class RefereeService {
 	public void delete(Referee entity) {
 		refereeRepository.delete(entity);
 	}
-	
+
 	public Referee create() {
 
 		Referee result;
@@ -83,19 +87,19 @@ public class RefereeService {
 	public Report selfAssignComplaint(Report r, Complaint c) {
 		Assert.notNull(r);
 		Assert.notNull(c);
-		
+
 		r.getComplaints().add(c);
-		
+
 		return reportService.save(r);
 	}
-	
+
 	public Referee findRefereeByUserAccount(final UserAccount userAccount) {
 		Assert.notNull(userAccount);
 		Assert.isTrue(userAccount.getId() != 0);
 		final Referee res = this.refereeRepository.findByUserAccountId(userAccount.getId());
 		return res;
 	}
-	
+
 	public Report saveReport(final Report report) {
 		Assert.notNull(report);
 		Assert.isTrue(report.getId() != 0);
@@ -104,26 +108,55 @@ public class RefereeService {
 		Authority authority = new Authority();
 		authority.setAuthority("REFEREE");
 		Report saved = this.reportService.findOne(report.getId());
-		if(reportService.exists(report.getId()) && logedUserAccount.getAuthorities().contains(authority) && saved.isFinalMode() && findRefereeByUserAccount(logedUserAccount).equals(findRefereeByReport(report)) ) {
+		if (reportService.exists(report.getId()) && logedUserAccount.getAuthorities().contains(authority)
+				&& saved.isFinalMode()
+				&& findRefereeByUserAccount(logedUserAccount).equals(findRefereeByReport(report))) {
 			Assert.notNull(saved, "report.not.null");
-			Assert.isTrue(referee.getUserAccount().isAccountNonLocked() && !(referee.isSuspicious()),"referee.notEqual.accountOrSuspicious");
-			
+			Assert.isTrue(referee.getUserAccount().isAccountNonLocked() && !(referee.isSuspicious()),
+					"referee.notEqual.accountOrSuspicious");
+
 			Report result = this.reportService.save(report);
 			Assert.notNull(result);
 			return result;
-		}else {
+		} else {
 			Report result = this.reportService.findOne(report.getId());
 			return result;
 		}
-	}	
-		
-		public Referee findRefereeByReport(Report report) {
-			Assert.notNull(report);
-			Assert.isTrue(report.getId()!=0);
-			Referee res = refereeRepository.findRefereeByReportId(report.getId());
-			Assert.notNull(res);
-			return res;
+	}
+
+	public Report saveNoteInReport(Report report, Note note, String comment) {
+		Assert.notNull(report);
+		Assert.isTrue(report.getId() != 0);
+		Assert.notNull(note);
+
+		UserAccount logedUserAccount = LoginService.getPrincipal();
+		Referee referee = findRefereeByUserAccount(logedUserAccount);
+		Authority authority = new Authority();
+		authority.setAuthority("REFEREE");
+		Assert.isTrue(logedUserAccount.getAuthorities().contains(authority));
+		Assert.isTrue(report.isFinalMode());
+		Assert.isTrue(findRefereeByUserAccount(logedUserAccount).equals(findRefereeByReport(report)));
+		Assert.isTrue(referee.getUserAccount().isAccountNonLocked() && !(referee.isSuspicious()),
+				"referee.notEqual.accountOrSuspicious");
+		if (report.getNotes().contains(note) && comment != null) {
+			note.getComments().add(logedUserAccount.getUsername() + ": -" + comment);
+			report.getNotes().add(note);
+		} else {
+			report.getNotes().add(noteservice.save(note));
 		}
-	
+
+		Report result = this.reportService.save(report);
+		Assert.notNull(result);
+		return result;
+
+	}
+
+	public Referee findRefereeByReport(Report report) {
+		Assert.notNull(report);
+		Assert.isTrue(report.getId() != 0);
+		Referee res = refereeRepository.findRefereeByReportId(report.getId());
+		Assert.notNull(res);
+		return res;
+	}
 
 }

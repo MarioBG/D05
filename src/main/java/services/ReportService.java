@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import domain.Customer;
+import domain.HandyWorker;
+import domain.Referee;
 import domain.Report;
 import repositories.ReportRepository;
 
@@ -48,11 +51,28 @@ public class ReportService {
 		return res;
 	}
 	
-//	public Collection<Report> findReportByCustomerUserAccount(UserAccount userAccount){
-//		Collection<Report> res = reportrepository.findReportByCustomerUserAccountId(userAccount.getId());
-//		Assert.notNull(res);
-//		return res;
-//	}
+	public Collection<Report> findReportsByCustomer(Customer customer){
+		Assert.notNull(customer);
+		Assert.isTrue(customer.getId()!=0);
+		Collection<Report> res = reportrepository.findReportsByCustomerId(customer.getId());
+		Assert.notEmpty(res);
+		return res;
+	}
 	
+	public Collection<Report> findReportsInFinalModeByReferee (Referee referee) {
+		Assert.notNull(referee);
+		Assert.isTrue(referee.getId() != 0);
+		Collection<Report> res = reportrepository.findReportsInFinalModeByRefereeId(referee.getId());
+		Assert.notNull(res);
+		return res;	
+	}
+	
+	public Collection<Report> findReportsByHandyWorker(HandyWorker handyWorker){
+		Assert.notNull(handyWorker);
+		Assert.isTrue(handyWorker.getId()!=0);
+		Collection<Report> res = reportrepository.findReportsByHandyWorkerId(handyWorker.getId());
+		Assert.notEmpty(res);
+		return res;
+	}
 	
 }

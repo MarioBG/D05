@@ -10,15 +10,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import repositories.SponsorRepository;
+import security.Authority;
+import security.LoginService;
+import security.UserAccount;
 import domain.Box;
 import domain.Message;
 import domain.SocialIdentity;
 import domain.Sponsor;
 import domain.Sponsorship;
-import repositories.SponsorRepository;
-import security.Authority;
-import security.LoginService;
-import security.UserAccount;
 
 @Service
 @Transactional
@@ -61,14 +61,12 @@ public class SponsorService {
 	public Sponsor save(final Sponsor sponsor) {
 		Sponsor result, saved;
 		final UserAccount logedUserAccount;
-		Authority authority, authority2;
+		Authority authority;
 		Md5PasswordEncoder encoder;
 
 		encoder = new Md5PasswordEncoder();
 		authority = new Authority();
 		authority.setAuthority("SPONSOR");
-		authority2 = new Authority();
-		authority2.setAuthority("ADMINISTRADOR");
 		Assert.notNull(sponsor, "sponsor.not.null");
 
 		if (this.exists(sponsor.getId())) {
@@ -82,9 +80,6 @@ public class SponsorService {
 			Assert.isTrue(sponsor.getUserAccount().isAccountNonLocked() == saved.getUserAccount().isAccountNonLocked() && sponsor.isSuspicious() == saved.isSuspicious(), "sponsor.notEqual.accountOrSuspicious");
 
 		} else {
-			logedUserAccount = LoginService.getPrincipal();
-			Assert.notNull(logedUserAccount, "admin.notLogged ");
-			Assert.isTrue(logedUserAccount.getAuthorities().contains(authority2), "admin.notEqual.userAccount");
 			Assert.isTrue(sponsor.isSuspicious() == false, "admin.notSuspicious.false");
 			sponsor.getUserAccount().setPassword(encoder.encodePassword(sponsor.getUserAccount().getPassword(), null));
 			sponsor.getUserAccount().setEnabled(true);
@@ -152,6 +147,17 @@ public class SponsorService {
 		Assert.notNull(sponsor);
 		Assert.isTrue(this.sponsorRepository.exists(sponsor.getId()));
 		this.sponsorRepository.delete(sponsor);
+	}
+
+	public Sponsor findByPrincipal() {
+		Sponsor res;
+		UserAccount userAccount;
+		userAccount = LoginService.getPrincipal();
+		if (userAccount == null)
+			res = null;
+		else
+			res = this.sponsorRepository.findByUserAccountId(userAccount.getId());
+		return res;
 	}
 
 }

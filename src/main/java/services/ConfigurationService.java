@@ -35,5 +35,10 @@ public class ConfigurationService {
 	public void delete(Configuration entity) {
 		configurationRepository.delete(entity);
 	}
+	
+	public Configuration findConfiguration() {
+		return this.configurationRepository.findAll().iterator().next();
+	}
+
 
 }
