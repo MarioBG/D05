@@ -27,6 +27,9 @@ public interface CustomerRepository extends JpaRepository<Customer, Integer> {
 	@Query("select t from Customer t order by t.complaints.size")
 	Collection<Customer> topThreeCustomersInTermsOfComplaints();
 
+	@Query("select distinct c from Customer c left join c.fixUpTasks fix where c.fixUpTasks.size >= (select avg(r.fixUpTasks.size) * 1.1 from Customer r) order by fix.applications.size")
+	Collection<Customer> customersWith10PercentMoreAvgFixUpTask();
+
 	@Query("select c from HandyWorker h join h.applications a join a.fixUpTask f, Customer c where f member of c.fixUpTasks and a.status='ACCEPTED' and h.userAccount.id = ?1")
 	Collection<Customer> getCustomersForHandyWorkerWithUserAccountId(int id);
 

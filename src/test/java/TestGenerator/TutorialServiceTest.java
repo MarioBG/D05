@@ -1,39 +1,35 @@
-
 package TestGenerator;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
-import javax.transaction.Transactional;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-import services.HandyWorkerService;
-import services.TutorialService;
-import utilities.AbstractTest;
 import domain.HandyWorker;
 import domain.Section;
 import domain.Tutorial;
+import services.HandyWorkerService;
+import services.TutorialService;
+import utilities.AbstractTest;
 
-@ContextConfiguration(locations = {
-	"classpath:spring/junit.xml", "classpath:spring/datasource.xml", "classpath:spring/config/packages.xml"
-})
+@ContextConfiguration(locations = { "classpath:spring/junit.xml", "classpath:spring/datasource.xml",
+		"classpath:spring/config/packages.xml" })
 @RunWith(SpringJUnit4ClassRunner.class)
 @Transactional
-public class TutorialServiceTest extends AbstractTest {
+public class TutorialServiceTest extends AbstractTest{
 
 	@Autowired
-	private TutorialService		tutorialService;
+	private TutorialService tutorialService;
 
 	@Autowired
-	private HandyWorkerService	handyWorkerService;
-
+	private HandyWorkerService handyWorkerService;
 
 	@Test
 	public void saveTutorialTest() {
@@ -110,5 +106,4 @@ public class TutorialServiceTest extends AbstractTest {
 		Assert.isTrue(this.tutorialService.exists(tutorial.getId()));
 		this.tutorialService.delete(tutorial);
 	}
-
 }

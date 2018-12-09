@@ -1,4 +1,3 @@
-
 package services;
 
 import java.util.ArrayList;
@@ -10,24 +9,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-import repositories.SectionRepository;
 import domain.Section;
+import repositories.SectionRepository;
 
 @Service
 @Transactional
 public class SectionService {
 
-	//Managed Repository
+	// Managed Repository
 	@Autowired
-	private SectionRepository	sectionRepository;
+	private SectionRepository sectionRepository;
 
-
-	//Constructor
+	// Constructor
 	public SectionService() {
 		super();
 	}
 
-	//Simple CRUD methods
+	// Simple CRUD methods
 	public Section create() {
 		Section result;
 
@@ -69,10 +67,13 @@ public class SectionService {
 		sections = null;
 	}
 
-	//Other Business
+	public void delete(Section entity) {
+		sectionRepository.delete(entity);
+	}
+
+	// Other Business
 
 	public List<Section> getSectionsOrderedFromTutorial(final int tutorialId) {
 		return this.sectionRepository.getSectionsOrderedFromTutorial(tutorialId);
 	}
-
 }

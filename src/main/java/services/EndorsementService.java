@@ -1,4 +1,3 @@
-
 package services;
 
 import java.util.Collection;
@@ -10,27 +9,26 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import domain.Customer;
+import domain.Endorsement;
+import domain.HandyWorker;
 import repositories.EndorsementRepository;
 import security.Authority;
 import security.LoginService;
 import security.UserAccount;
-import domain.Customer;
-import domain.Endorsement;
-import domain.HandyWorker;
 
 @Service
 @Transactional
 public class EndorsementService {
 
 	@Autowired
-	private EndorsementRepository	endorsementRepository;
+	private EndorsementRepository endorsementRepository;
 
 	@Autowired
-	private HandyWorkerService		handyWorkerService;
+	private HandyWorkerService handyWorkerService;
 
 	@Autowired
-	private CustomerService			customerService;
-
+	private CustomerService customerService;
 
 	public Endorsement create() {
 		Endorsement result;
@@ -48,12 +46,14 @@ public class EndorsementService {
 		authority.setAuthority(Authority.CUSTOMER);
 		final Authority authority2 = new Authority();
 		authority2.setAuthority(Authority.HANDYWORKER);
-		Assert.isTrue(logedUserAccount.getAuthorities().contains(authority) || logedUserAccount.getAuthorities().contains(authority2));
+		Assert.isTrue(logedUserAccount.getAuthorities().contains(authority)
+				|| logedUserAccount.getAuthorities().contains(authority2));
 		if (entity.getId() == 0) {
 			entity.setMoment(new Date(System.currentTimeMillis() - 1));
 			if (this.customerService.findByPrincipal() != null) {
 				Assert.notNull(entity.getHandyWorker());
-				Assert.notNull(this.handyWorkerService.findByUserAccountId(entity.getHandyWorker().getUserAccount().getId()));
+				Assert.notNull(
+						this.handyWorkerService.findByUserAccountId(entity.getHandyWorker().getUserAccount().getId()));
 				final Customer c = this.customerService.findByPrincipal();
 				saved = this.endorsementRepository.save(entity);
 				this.customerService.addToCustomerEndorsements(c, saved);
@@ -67,6 +67,7 @@ public class EndorsementService {
 		}
 		return saved;
 	}
+
 	public Endorsement findOne(final Integer id) {
 		Assert.notNull(id);
 		return this.endorsementRepository.findOne(id);
@@ -101,7 +102,8 @@ public class EndorsementService {
 		authority.setAuthority(Authority.CUSTOMER);
 		final Authority authority2 = new Authority();
 		authority2.setAuthority(Authority.HANDYWORKER);
-		Assert.isTrue(logedUserAccount.getAuthorities().contains(authority) || logedUserAccount.getAuthorities().contains(authority2));
+		Assert.isTrue(logedUserAccount.getAuthorities().contains(authority)
+				|| logedUserAccount.getAuthorities().contains(authority2));
 		this.endorsementRepository.delete(id);
 	}
 
@@ -112,5 +114,4 @@ public class EndorsementService {
 	public void flush() {
 		this.endorsementRepository.flush();
 	}
-
 }

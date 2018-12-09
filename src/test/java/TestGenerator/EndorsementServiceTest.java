@@ -3,13 +3,12 @@ package TestGenerator;
 
 import java.util.Collection;
 
-import javax.transaction.Transactional;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import services.CustomerService;
@@ -48,15 +47,12 @@ public class EndorsementServiceTest extends AbstractTest {
 		endorsement.setHandyWorker(h);
 		endorsement.setComment("Cosas cosos de chapuzas");
 		saved = this.endorsementService.save(endorsement);
-		System.out.println(saved);
-		System.out.println(saved.getCustomer());
-		System.out.println(saved.getHandyWorker());
 		endorsements = this.endorsementService.findAll();
 		Assert.isTrue(endorsements.contains(saved));
 	}
 
 	@Test
-	//TODO TransientObjectException (objeto sin guardar?)
+	// TODO TransientObjectException (objeto sin guardar?)
 	public void endorseAsHandyWorker() {
 		Endorsement endorsement, saved;
 		Collection<Endorsement> endorsements;
@@ -70,6 +66,7 @@ public class EndorsementServiceTest extends AbstractTest {
 		endorsements = this.endorsementService.findAll();
 		Assert.isTrue(endorsements.contains(saved));
 	}
+
 	@Test
 	public void findAllEndorsementTest() {
 		Collection<Endorsement> result;
@@ -95,5 +92,4 @@ public class EndorsementServiceTest extends AbstractTest {
 		Assert.isTrue(this.endorsementService.exists(endorsement.getId()));
 		this.endorsementService.delete(endorsement.getId());
 	}
-
 }

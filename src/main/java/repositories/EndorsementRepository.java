@@ -23,5 +23,4 @@ public interface EndorsementRepository extends JpaRepository<Endorsement, Intege
 
 	@Query("select e from Endorsement e where e.handyWorker.userAccount.id = ?1")
 	public Collection<Endorsement> findReceivedEndorsementsByHandyWorkerUserAccountId(int id);
-
 }

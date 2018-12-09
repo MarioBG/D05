@@ -16,17 +16,16 @@ import org.hibernate.validator.constraints.URL;
 @Entity
 public class Configuration extends DomainEntity {
 
-	private String				bannerURL;
-	private Collection<String>	spamWords;
-	private Collection<String>	badWords;
-	private Collection<String>	goodWords;
-	private double				VATTax;
-	private String				countryCode;
-	private Double				finderCached;
-	private Integer				finderReturn;
-	private String				systemName;
-	private String				defaultCreditCards;
-
+	private String bannerURL;
+	private Collection<String> spamWords;
+	private Collection<String> badWords;
+	private Collection<String> goodWords;
+	private double VATTax;
+	private String countryCode;
+	private Double finderCached;
+	private Integer finderReturn;
+	private String systemName;
+	private String defaultCreditCards;
 
 	@URL
 	public String getBannerURL() {
@@ -117,11 +116,9 @@ public class Configuration extends DomainEntity {
 		this.goodWords = goodWords;
 	}
 
-
 	// Relationships ----------------------------------------------------------
 
-	private Collection<WelcomeMessage>	welcomeMessage;
-
+	private Collection<WelcomeMessage> welcomeMessage;
 
 	@OneToMany
 	public Collection<WelcomeMessage> getWelcomeMessage() {

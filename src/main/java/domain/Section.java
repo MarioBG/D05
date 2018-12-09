@@ -12,11 +12,10 @@ import org.hibernate.validator.constraints.NotBlank;
 @Entity
 public class Section extends DomainEntity {
 
-	private String				title;
-	private String				text;
-	private Collection<String>	pictures;
-	private int					number;
-
+	private String title;
+	private String text;
+	private Collection<String> pictures;
+	private int number;
 
 	@NotBlank
 	public String getTitle() {
