@@ -8,8 +8,6 @@ import javax.persistence.ManyToOne;
 import javax.validation.Valid;
 import javax.validation.constraints.Past;
 
-import org.hibernate.validator.constraints.NotBlank;
-
 @Entity
 public class Endorsement extends DomainEntity {
 
@@ -26,7 +24,6 @@ public class Endorsement extends DomainEntity {
 		this.moment = moment;
 	}
 
-	@NotBlank
 	public String getComment() {
 		return this.comment;
 	}

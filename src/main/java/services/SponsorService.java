@@ -10,14 +10,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import domain.Box;
+import domain.Message;
+import domain.SocialIdentity;
+import domain.Sponsor;
+import domain.Sponsorship;
 import repositories.SponsorRepository;
 import security.Authority;
 import security.LoginService;
 import security.UserAccount;
-import domain.Box;
-import domain.SocialIdentity;
-import domain.Sponsor;
-import domain.Sponsorship;
 
 @Service
 @Transactional
@@ -27,9 +28,6 @@ public class SponsorService {
 
 	@Autowired
 	private SponsorRepository	sponsorRepository;
-
-	@Autowired
-	private BoxService			boxService;
 
 
 	// Supporting services ----------------------------------------------------
@@ -63,14 +61,12 @@ public class SponsorService {
 	public Sponsor save(final Sponsor sponsor) {
 		Sponsor result, saved;
 		final UserAccount logedUserAccount;
-		Authority authority, authority2;
+		Authority authority;
 		Md5PasswordEncoder encoder;
 
 		encoder = new Md5PasswordEncoder();
 		authority = new Authority();
 		authority.setAuthority("SPONSOR");
-		authority2 = new Authority();
-		authority2.setAuthority("ADMINISTRADOR");
 		Assert.notNull(sponsor, "sponsor.not.null");
 
 		if (this.exists(sponsor.getId())) {
@@ -84,12 +80,32 @@ public class SponsorService {
 			Assert.isTrue(sponsor.getUserAccount().isAccountNonLocked() == saved.getUserAccount().isAccountNonLocked() && sponsor.isSuspicious() == saved.isSuspicious(), "sponsor.notEqual.accountOrSuspicious");
 
 		} else {
-			logedUserAccount = LoginService.getPrincipal();
-			Assert.notNull(logedUserAccount, "admin.notLogged ");
-			Assert.isTrue(logedUserAccount.getAuthorities().contains(authority2), "admin.notEqual.userAccount");
 			Assert.isTrue(sponsor.isSuspicious() == false, "admin.notSuspicious.false");
 			sponsor.getUserAccount().setPassword(encoder.encodePassword(sponsor.getUserAccount().getPassword(), null));
 			sponsor.getUserAccount().setEnabled(true);
+			Collection<Message> messages = new LinkedList<>();
+			Box inbox = new Box();
+			inbox.setName("INBOX");
+			inbox.setPredefined(true);
+			inbox.setMessages(messages);
+			Box outbox = new Box();
+			outbox.setName("OUTBOX");
+			outbox.setPredefined(true);
+			outbox.setMessages(messages);
+			Box trashbox = new Box();
+			trashbox.setName("TRASHBOX");
+			trashbox.setPredefined(true);
+			trashbox.setMessages(messages);
+			Box spambox = new Box();
+			spambox.setName("INBOX");
+			spambox.setPredefined(true);
+			spambox.setMessages(messages);
+			Collection<Box> boxes = new LinkedList<Box>();
+			boxes.add(inbox);
+			boxes.add(outbox);
+			boxes.add(trashbox);
+			boxes.add(spambox);
+			sponsor.setBoxes(boxes);
 
 		}
 
@@ -97,17 +113,6 @@ public class SponsorService {
 
 		return result;
 
-	}
-
-	public Sponsor findByPrincipal() {
-		Sponsor res;
-		UserAccount userAccount;
-		userAccount = LoginService.getPrincipal();
-		if (userAccount == null)
-			res = null;
-		else
-			res = this.sponsorRepository.findByUserAccountId(userAccount.getId());
-		return res;
 	}
 
 	public Sponsor create() {
@@ -122,11 +127,11 @@ public class SponsorService {
 
 		result.setSuspicious(false);
 
-		authority.setAuthority(Authority.SPONSOR);
+		authority.setAuthority("SPONSOR");
 		userAccount.addAuthority(authority);
 		userAccount.setEnabled(true);
 
-		final Collection<Box> boxes = this.boxService.defaultFolders();
+		final Collection<Box> boxes = new LinkedList<>();
 		result.setBoxes(boxes);
 		final Collection<Sponsorship> sponsorships = new LinkedList<>();
 		result.setSponsorships(sponsorships);
@@ -137,6 +142,7 @@ public class SponsorService {
 		return result;
 
 	}
+
 	public void delete(final Sponsor sponsor) {
 		Assert.notNull(sponsor);
 		Assert.isTrue(this.sponsorRepository.exists(sponsor.getId()));

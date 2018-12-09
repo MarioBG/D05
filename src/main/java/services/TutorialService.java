@@ -1,4 +1,3 @@
-
 package services;
 
 import java.util.ArrayList;
@@ -14,13 +13,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import domain.HandyWorker;
+import domain.Section;
+import domain.Tutorial;
 import repositories.TutorialRepository;
 import security.Authority;
 import security.LoginService;
 import security.UserAccount;
-import domain.HandyWorker;
-import domain.Section;
-import domain.Tutorial;
 
 @Service
 @Transactional
@@ -29,19 +28,18 @@ public class TutorialService {
 	// Managed repository -----------------------------------------------------
 
 	@Autowired
-	private TutorialRepository	tutorialRepository;
+	private TutorialRepository tutorialRepository;
 
 	// Supporting services ----------------------------------------------------
 
 	@Autowired
-	private HandyWorkerService	handyWorkerService;
+	private HandyWorkerService handyWorkerService;
 
 	@Autowired
-	private SectionService		sectionService;
+	private SectionService sectionService;
 
 	@PersistenceContext
-	EntityManager				entitymanager;
-
+	EntityManager entitymanager;
 
 	// Simple CRUD methods ----------------------------------------------------
 
@@ -93,6 +91,7 @@ public class TutorialService {
 		tutorial.setSections(sections);
 		return this.tutorialRepository.save(tutorial);
 	}
+
 	public boolean exists(final Integer id) {
 		return this.tutorialRepository.exists(id);
 	}
@@ -107,5 +106,4 @@ public class TutorialService {
 
 		return result;
 	}
-
 }

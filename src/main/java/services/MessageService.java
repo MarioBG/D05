@@ -23,7 +23,7 @@ public class MessageService {
 	@Autowired
 	private ActorService actorservice;
 	@Autowired
-	private BoxService boxservices;
+	private BoxServices boxservices;
 
 	public Message save(Message entity) {
 		return messagerepository.save(entity);
@@ -123,5 +123,12 @@ public class MessageService {
 		return saved;
 	}
 	
+	public Collection<Message> findMessagesFromActor(Actor actor){
+		Assert.notNull(actor);
+		Assert.isTrue(actor.getId()!=0);
+		Collection<Message> res = messagerepository.messagesFromActorId(actor.getId());
+		Assert.notEmpty(res);
+		return res;
+	}
 	
 }

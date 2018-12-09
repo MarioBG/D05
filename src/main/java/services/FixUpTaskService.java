@@ -2,11 +2,9 @@
 package services;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +17,6 @@ import repositories.FixUpTaskRepository;
 
 @Service
 @Transactional
-@SuppressWarnings("unchecked")
 public class FixUpTaskService {
 
 	// Managed repository -----------------------------------------------------
@@ -32,12 +29,8 @@ public class FixUpTaskService {
 	@Autowired
 	private CustomerService customerService;
 
-	@PersistenceContext
-	EntityManager entitymanager;
-
 	// Simple CRUD methods ----------------------------------------------------
 
-	
 	public FixUpTask save(FixUpTask entity) {
 		return fixUpTaskRepository.save(entity);
 	}
@@ -54,13 +47,6 @@ public class FixUpTaskService {
 		fixUpTaskRepository.delete(entity);
 	}
 
-	public FixUpTask addPhases(FixUpTask fixUpTask) {
-		
-		return fixUpTask;
-	}
-
-	
-
 	public boolean exists(final Integer id) {
 		return this.fixUpTaskRepository.exists(id);
 	}
@@ -76,23 +62,51 @@ public class FixUpTaskService {
 
 		return result;
 	}
-	
-	public Collection<FixUpTask> findAllFixUpTaskWithAcceptedApplications(){
+
+	public Collection<FixUpTask> findAllFixUpTaskWithAcceptedApplications() {
 		Collection<FixUpTask> res;
 		res = fixUpTaskRepository.findAllFixUpTaskWithAcceptedApplications();
 		Assert.notEmpty(res);
 		return res;
 	}
 
-	public List<FixUpTask> filter(String command, int maxResults) {
-		Query query = entitymanager.createQuery(
-				"select c from FixUpTask c where c.ticker like CONCAT('%',:command,'%') or c.description like CONCAT('%',:command,'%') or c.address like CONCAT('%',:command,'%') or c.maxPrice = :command")
-				.setMaxResults(maxResults);
-		query.setParameter("command", command);
-
-		List<FixUpTask> fixuptask = query.getResultList();
-
-		return fixuptask;
+	public Collection<Double> findAvgMinMaxStdDvtFixUpTasksPerUser() {
+		Collection<Double> res = fixUpTaskRepository.findAvgMinMaxStrDvtFixUpTaskPerUser();
+		return res;
+	}
+	
+	public Collection<Double> findAvgMinMaxStrDvtPerFixUpTask() {
+		Collection<Double> res = fixUpTaskRepository.findAvgMinMaxStrDvtPerFixUpTask();
+		return res;
+	}
+	
+	public Double ratioFixUpTasksWithComplaints() {
+		Double res = fixUpTaskRepository.ratioFixUpTasksWithComplaints();
+		Assert.notNull(res);
+		return res;
+	}
+	
+	public String generateAlphanumeric() {
+		final Character[] letras = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+				'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z','0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+		final Random rand = new Random();
+		String alpha = "";
+		for(int i = 0; i<6; i++) {
+			alpha+=letras[rand.nextInt(letras.length-1)];
+		}
+		
+		return alpha;
+	}
+	
+	@SuppressWarnings("deprecation")
+	public String tickerGenerator() {
+		String str = "";
+		Date date = new Date(System.currentTimeMillis());
+		str += Integer.toString(date.getYear()).substring(Integer.toString(date.getYear()).length()-2);
+		str += String.format("%02d", date.getMonth());
+		str += String.format("%02d", date.getDay());
+		String res = str + "-" + generateAlphanumeric() ;
+		return res;
 	}
 
 }
