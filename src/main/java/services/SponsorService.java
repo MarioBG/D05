@@ -10,15 +10,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import repositories.SponsorRepository;
+import security.Authority;
+import security.LoginService;
+import security.UserAccount;
 import domain.Box;
 import domain.Message;
 import domain.SocialIdentity;
 import domain.Sponsor;
 import domain.Sponsorship;
-import repositories.SponsorRepository;
-import security.Authority;
-import security.LoginService;
-import security.UserAccount;
 
 @Service
 @Transactional
@@ -147,6 +147,17 @@ public class SponsorService {
 		Assert.notNull(sponsor);
 		Assert.isTrue(this.sponsorRepository.exists(sponsor.getId()));
 		this.sponsorRepository.delete(sponsor);
+	}
+
+	public Sponsor findByPrincipal() {
+		Sponsor res;
+		UserAccount userAccount;
+		userAccount = LoginService.getPrincipal();
+		if (userAccount == null)
+			res = null;
+		else
+			res = this.sponsorRepository.findByUserAccountId(userAccount.getId());
+		return res;
 	}
 
 }
