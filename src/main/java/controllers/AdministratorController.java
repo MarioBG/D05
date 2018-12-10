@@ -10,16 +10,23 @@
 
 package controllers;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+
+import security.LoginService;
+import security.UserAccount;
+import services.AdministratorService;
 
 @Controller
 @RequestMapping("/administrator")
 public class AdministratorController extends AbstractController {
 
 	// Constructors -----------------------------------------------------------
-
+	@Autowired
+	AdministratorService administratorservice;
+	
 	public AdministratorController() {
 		super();
 	}
@@ -42,6 +49,16 @@ public class AdministratorController extends AbstractController {
 		ModelAndView result;
 
 		result = new ModelAndView("administrator/action-2");
+
+		return result;
+	}
+	
+	@RequestMapping("/view")
+	public ModelAndView view() {
+		ModelAndView result;
+
+		result = new ModelAndView("administrator/view");
+		result.addObject("actor", administratorservice.findSelf());
 
 		return result;
 	}

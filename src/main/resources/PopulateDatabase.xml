@@ -494,13 +494,13 @@
 	</bean>
 
 	<bean id="userAccount16" class="security.UserAccount">
-		<property name="username" value="useracount16" />
-		<property name="password" value="asasas" />
+		<property name="username" value="administrator0" />
+		<property name="password" value="8e389be9b9244ca6b9c4b3a779a9a39d" />
 		<property name="enabled" value="true" />
 		<property name="authorities">
 			<list>
 				<bean class="security.Authority">
-					<property name="authority" value="REFEREE" />
+					<property name="authority" value="ADMINISTRATOR" />
 				</bean>
 			</list>
 		</property>

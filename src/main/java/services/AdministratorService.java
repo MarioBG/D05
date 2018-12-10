@@ -84,6 +84,10 @@ public class AdministratorService {
 
 	@Autowired
 	private EndorsementService endorsementService;
+	
+	public Administrator findSelf() {
+		return administratorRepository.findSelf(LoginService.getPrincipal().getUsername());
+	}
 
 	// Simple CRUD methods ----------------------------------------------------
 
