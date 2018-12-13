@@ -9,8 +9,11 @@ import domain.Administrator;
 
 @Repository
 public interface AdministratorRepository extends JpaRepository<Administrator, Integer> {
-	
+
 	@Query("select c from Administrator c where c.userAccount.username = ?1")
 	Administrator findSelf(String username);
+
+	@Query("select c from Administrator c where c.userAccount.id = ?1")
+	Administrator findByUserAccountId(int id);
 
 }
