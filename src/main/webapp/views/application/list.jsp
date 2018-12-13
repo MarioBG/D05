@@ -21,27 +21,17 @@
 
 <style type="text/css">
 
-.pending{background-color: white;}
-.pendingPeriodPassed{background-color: grey;}
-.accepted{background-color: green;}
-.accepted a{color: white;}
-.rejected{background-color: orange;}
+	.pending{color: white;}
+	.pendingPeriodPassed{color: grey;}
+	.accepted{color: green;}
+	.rejected{color: orange;}
 
 </style>
 
 <!-- Listing grid -->
 
-<security:authorize access="hasRole('EXPLORER')">
-<spring:message code="application.filterByStatus"/>
-<%-- <form action="application/explorer/list.do">
-<select name="statusSelection">
-<jstl:forEach items="${statusSet}" var="status">
-<option label="${status}" value="${status}"/>
-</jstl:forEach>
-</select>
-<input type="submit"/>
-</form> --%>
-<a href="application/explorer/list.do"><spring:message code="application.seeAll"/></a>
+<security:authorize access="hasRole('CUSTOMER')">
+	<a href="application/customer/list.do"><spring:message code="application.seeAll"/></a>
 </security:authorize>
 <display:table pagesize="5" class="displaytag" keepStatus="true"
 	name="applications"  requestURI="${requestURI}" id="row">
@@ -75,9 +65,18 @@
 		</jstl:when>
 		
 	</jstl:choose>
-
+	
+	<security:authorize access="hasRole('CUSTOMER')">
+		<spring:message code="application.edit" var="editHeader" />
+		<display:column property="creditCard.number" title="${ editHeader }"/>
+	</security:authorize>
+	
+	<spring:message code="application.creditCard" var="creditCardHeader" />
+	<display:column property="creditCard.number" title="${ creditCardHeader }"/>
+	
 	<spring:message code="application.creationMoment" var="creationMomentHeader" />
 	<spring:message code="master.page.date.format" var="dateFormat" />
+	
 	<display:column property="creationMoment" title="${creationMomentHeader}"
 		 format="{0,date,${dateFormat}}" />
 
@@ -102,18 +101,20 @@
 	</security:authorize>
 	</display:column>
 	
-	<spring:message code="application.fixUpTask" var="fixUpTask" />
-	<display:column property="fixUpTask.description" title="${fixUpTask}" />
+	<jstl:if test="${ requestURI eq 'application/customer/list.do' or requestURI eq 'application/handyWorker/list.do' }">
+		<spring:message code="application.fixUpTask" var="fixUpTask" />
+		<display:column property="fixUpTask.description" title="${fixUpTask}" />
+	</jstl:if>
 
 	<spring:message code="application.creditCard"
-		var="creditCard" />
-	<display:column title="${creditCard}">
+		var="creditCardHeader" />
+	<display:column title="${creditCardHeader}">
 	
 	 	<jstl:choose>
 
-			<jstl:when test="${empty row.creditCard and row.status == 'DUE'}">
-			<security:authorize access="hasRole('EXPLORER')">
-				<a href="application/edit.do?applicationId=${row.id}"><spring:message
+			<jstl:when test="${empty row.creditCard and row.status == 'ACCEPTED'}">
+			<security:authorize access="hasRole('CUSTOMER')">
+				<a href="application/customer/edit.do?applicationId=${row.id}"><spring:message
 						code="application.enterCard" /></a>
 			</security:authorize>
 			</jstl:when>
@@ -128,8 +129,15 @@
 	<spring:message code="application.comment" var="comment" />
 	<display:column property="comments" title="${comment}"  />
 	
+	<spring:message code="application.handyWorker" var="handyWorkerHeader" />
+	<display:column title="${handyWorkerHeader}"/>
+	<a href="handyWorker.display.do?handyWorkerId=<jstl:out value="${ row.handyWorker.id }"/>"><jstl:out value="${ row.handyWorker.name }"/></a>
+	
+	
 </display:table>
 
 <security:authorize access="hasRole('HANDYWORKER')">
-<a href="application/explorer/create.do"><spring:message code="application.create"/></a>
- </security:authorize>
+	<jstl:if test="${ requestURI eq 'application/handyWorker/list.do' }">
+		<a href="application/handyWorker/create.do?fixUpTaskId=<jstl:out var="fixUpTask.id"/>"><spring:message code="application.create"/></a>
+	</jstl:if>
+</security:authorize>
