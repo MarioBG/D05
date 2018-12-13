@@ -15,7 +15,7 @@
 </head>
 <body>
 
-	<form:form modelAttribute="tutorial" action="tutorial/handyworker/list.do">
+	<form:form modelAttribute="tutorial" action="tutorial/handyworker/edit.do">
 		<!-- Title -->
 			 <form:label path="title">
 				<spring:message code="tutorial.title" />
