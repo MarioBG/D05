@@ -40,5 +40,19 @@ public class ConfigurationService {
 		return this.configurationRepository.findAll().iterator().next();
 	}
 
+	public String findCountryCode() {
+		String result;
 
+		result = this.configurationRepository.findCountryCode();
+
+		return result;
+	}
+	
+	public Double findVat() {
+		Double result;
+
+		result = this.configurationRepository.findVat();
+
+		return result;
+	}
 }

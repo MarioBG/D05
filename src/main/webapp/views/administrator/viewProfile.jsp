@@ -18,32 +18,51 @@
 	uri="http://www.springframework.org/security/tags"%>
 <%@taglib prefix="display" uri="http://displaytag.sf.net"%>
 
-<table class="ui celled table <jstl:if test='${actor.suspicious}'>red</jstl:if>">
+<table
+	class="ui celled table <jstl:if test='${actor.suspicious}'>red</jstl:if>">
 	<thead>
 		<tr>
 			<th colspan="2">
 				<h4 class="ui image header">
 					<img src="${actor.photo}" class="ui mini rounded image">
-					<div class="content">
-						${actor.name}
-						<div class="sub header">${actor.middleName}${actor.surname}</div>
-					</div>
+						<div class="content">
+							<spring:message code="administrator.profile.title"/> ${actor.name}
+						</div>
 				</h4>
 			</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr>
-			<td data-label="email">Email</td>
+			<td><spring:message code="administrator.name"/>
+			<td data-label="name">${actor.name}</td>
+		</tr>
+		<tr>
+			<td><spring:message code="administrator.middleName"/>
+			<td data-label="MiddleName">${actor.middleName}</td>
+		</tr>
+		<tr>
+			<td><spring:message code="administrator.surname"/>
+			<td data-label="surname">${actor.surname}</td>
+		</tr>
+		<tr>
+			<td><spring:message code="administrator.email"/>
 			<td data-label="email">${actor.email}</td>
 		</tr>
 		<tr>
-			<td data-label="phoneNumber">Phone Number</td>
+			<td><spring:message code="administrator.phoneNumber"/>
 			<td data-label="phoneNumber">${actor.phoneNumber}</td>
 		</tr>
 		<tr>
-			<td data-label="address">Address</td>
+			<td><spring:message code="administrator.address"/>
 			<td data-label="address">${actor.address}</td>
 		</tr>
 	</tbody>
 </table>
+
+<input type="button" name="save" class="ui button"
+ value="<spring:message code="administrator.modify" />"
+ onclick="javascript: relativeRedir('administrator/modifyProfile.do');" />
+
+</body>
+</html>
