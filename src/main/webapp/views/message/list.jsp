@@ -15,7 +15,7 @@
 <b><spring:message code="message.messages" /> :</b>
 <br />
 <display:table pagesize="10" class="displaytag" name="messages"
-	requestURI="message/list.do" id="row2">
+	requestURI="message/actor/list.do" id="row2">
 
 	<%-- <display:column>
 		<a href="message/display.do?messageId=<jstl:out value="${row2.id}"/>"><spring:message

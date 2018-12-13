@@ -15,7 +15,7 @@
 <spring:message code="message.saveStr" var="saveStr" />
 <spring:message code="message.destinations" var="destinations" />
 
-<form:form action="messages/send.do" modelAttribute="message">
+<form:form action="message/actor/send.do" modelAttribute="message">
 	<form:hidden path="id"/>
 	<form:hidden path="version"/>
 	<form:hidden path="moment"/>
