@@ -26,4 +26,19 @@
 		<put-attribute name="body" value="/views/customer/action-2.jsp" />
 	</definition>
 	
+	<definition name="customer/viewProfile" extends="master.page">	
+		<put-attribute name="title" value="My profile" />
+		<put-attribute name="body" value="/views/customer/viewProfile.jsp" />
+	</definition>
+	
+	<definition name="customer/modifyProfile" extends="master.page">	
+		<put-attribute name="title" value="Modify profile" />
+		<put-attribute name="body" value="/views/customer/modifyProfile.jsp" />
+	</definition>
+	
+	<definition name="customer/register" extends="master.page">	
+		<put-attribute name="title" value="Register" />
+		<put-attribute name="body" value="/views/customer/register.jsp" />
+	</definition>
+	
 </tiles-definitions>
