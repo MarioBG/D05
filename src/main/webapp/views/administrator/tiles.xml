@@ -26,9 +26,14 @@
 		<put-attribute name="body" value="/views/administrator/action-2.jsp" />
 	</definition>
 	
-	<definition name="administrator/view" extends="master.page">	
-		<put-attribute name="title" value="Mi profile" />
-		<put-attribute name="body" value="/views/administrator/view.jsp" />
+	<definition name="administrator/viewProfile" extends="master.page">	
+		<put-attribute name="title" value="My profile" />
+		<put-attribute name="body" value="/views/administrator/viewProfile.jsp" />
+	</definition>
+	
+	<definition name="administrator/modifyProfile" extends="master.page">	
+		<put-attribute name="title" value="Modify profile" />
+		<put-attribute name="body" value="/views/administrator/modifyProfile.jsp" />
 	</definition>
 	
 </tiles-definitions>
