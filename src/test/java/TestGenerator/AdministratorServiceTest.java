@@ -12,14 +12,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
 
-import domain.Actor;
-import domain.Administrator;
-import domain.Category;
-import domain.Configuration;
-import domain.HandyWorker;
-import domain.Referee;
-import domain.Sponsor;
-import domain.Warranty;
 import security.UserAccount;
 import security.UserAccountService;
 import services.ActorService;
@@ -32,6 +24,14 @@ import services.RefereeService;
 import services.SponsorService;
 import services.WarrantyService;
 import utilities.AbstractTest;
+import domain.Actor;
+import domain.Administrator;
+import domain.Category;
+import domain.Configuration;
+import domain.HandyWorker;
+import domain.Referee;
+import domain.Sponsor;
+import domain.Warranty;
 
 @ContextConfiguration(locations = {
 	"classpath:spring/junit.xml", "classpath:spring/datasource.xml", "classpath:spring/config/packages.xml"
@@ -44,31 +44,31 @@ public class AdministratorServiceTest extends AbstractTest {
 	private AdministratorService	administratorService;
 
 	@Autowired
-	private WarrantyService warrantyService;
+	private WarrantyService			warrantyService;
 
 	@Autowired
-	private FixUpTaskService fixUpTaskService;
-	
+	private FixUpTaskService		fixUpTaskService;
+
 	@Autowired
-	private CategoryService categoryService;
-	
+	private CategoryService			categoryService;
+
 	@Autowired
-	private RefereeService refereeService;
-	
+	private RefereeService			refereeService;
+
 	@Autowired
-	private SponsorService sponsorService;
-	
+	private SponsorService			sponsorService;
+
 	@Autowired
-	private ConfigurationService configurationService;
-	
+	private ConfigurationService	configurationService;
+
 	@Autowired
-	private UserAccountService userAccountService;
-	
+	private UserAccountService		userAccountService;
+
 	@Autowired
-	private HandyWorkerService handyWorkerService;
-	
+	private HandyWorkerService		handyWorkerService;
+
 	@Autowired
-	private ActorService actorService;
+	private ActorService			actorService;
 
 
 	@Test
@@ -126,37 +126,37 @@ public class AdministratorServiceTest extends AbstractTest {
 		Assert.isNull(administrator.getMiddleName());
 		Assert.isNull(administrator.getSurname());
 	}
-	
+
 	@Test
 	public void testChangeEnabledActor() {
-		UserAccount userAccount = userAccountService.findUserAccountByUsername("useracount15");
+		UserAccount userAccount = this.userAccountService.findUserAccountByUsername("useracount15");
 		Assert.notNull(userAccount);
-		HandyWorker handyWorker = handyWorkerService.findHandyWorkerByUserAccount(userAccount);
+		HandyWorker handyWorker = this.handyWorkerService.findHandyWorkerByUserAccount(userAccount);
 		Assert.notNull(handyWorker);
-		
-		boolean res = actorService.isSuspicious(handyWorker);
+
+		boolean res = this.actorService.isSuspicious(handyWorker);
 		Assert.isTrue(res == true);
 		UserAccount account = this.administratorService.changeEnabledActor(handyWorker.getUserAccount());
 
-		Assert.isTrue(account.isEnabled()==false);
+		Assert.isTrue(account.isEnabled() == false);
 	}
-	
+
 	@Test
 	public void testChangeEnabledActor2() {
-		UserAccount userAccount = userAccountService.findUserAccountByUsername("useracount15");
+		UserAccount userAccount = this.userAccountService.findUserAccountByUsername("useracount15");
 		Assert.notNull(userAccount);
-		HandyWorker handyWorker = handyWorkerService.findHandyWorkerByUserAccount(userAccount);
+		HandyWorker handyWorker = this.handyWorkerService.findHandyWorkerByUserAccount(userAccount);
 		Assert.notNull(handyWorker);
-		
-		boolean res = actorService.isSuspicious(handyWorker);
+
+		boolean res = this.actorService.isSuspicious(handyWorker);
 		Assert.isTrue(res == true);
 		UserAccount account = this.administratorService.changeEnabledActor(handyWorker.getUserAccount());
 
-		Assert.isTrue(account.isEnabled()==false);
-		
+		Assert.isTrue(account.isEnabled() == false);
+
 		account = this.administratorService.changeEnabledActor(handyWorker.getUserAccount());
 
-		Assert.isTrue(account.isEnabled()==true);
+		Assert.isTrue(account.isEnabled() == true);
 	}
 
 	private Administrator copyAdministrator(final Administrator administrator) {
@@ -179,7 +179,7 @@ public class AdministratorServiceTest extends AbstractTest {
 
 		return result;
 	}
-	
+
 	private Referee copyReferee(final Referee referee) {
 		Referee result;
 
@@ -201,7 +201,7 @@ public class AdministratorServiceTest extends AbstractTest {
 
 		return result;
 	}
-	
+
 	private Sponsor copySponsor(final Sponsor sponsor) {
 		Sponsor result;
 
@@ -224,16 +224,15 @@ public class AdministratorServiceTest extends AbstractTest {
 		return result;
 	}
 
-	
 	@Test
 	public void saveWarrantyTest() {
 		Warranty warranty, saved;
 		Collection<Warranty> warrantys;
 		this.authenticate(this.administratorService.findAll().iterator().next().getUserAccount().getUsername());
-		warranty = fixUpTaskService.findAll().iterator().next().getWarranty();
+		warranty = this.fixUpTaskService.findAll().iterator().next().getWarranty();
 		warranty.setTitle("Test Title");
-		saved = warrantyService.save(warranty);
-		warrantys = warrantyService.findAll();
+		saved = this.warrantyService.save(warranty);
+		warrantys = this.warrantyService.findAll();
 		Assert.isTrue(warrantys.contains(saved));
 	}
 
@@ -241,25 +240,25 @@ public class AdministratorServiceTest extends AbstractTest {
 	public void findAllWarrantyTest() {
 		this.authenticate(this.administratorService.findAll().iterator().next().getUserAccount().getUsername());
 		Collection<Warranty> result;
-		result = warrantyService.findAll();
+		result = this.warrantyService.findAll();
 		Assert.notNull(result);
 	}
 
 	@Test
 	public void findOneWarrantyTest() {
 		this.authenticate(this.administratorService.findAll().iterator().next().getUserAccount().getUsername());
-		Warranty warranty = warrantyService.findAll().iterator().next();
+		Warranty warranty = this.warrantyService.findAll().iterator().next();
 		int warrantyId = warranty.getId();
-		Assert.isTrue(warrantyService.exists(warrantyId));
+		Assert.isTrue(this.warrantyService.exists(warrantyId));
 		Warranty result;
-		result = warrantyService.findOne(warrantyId);
+		result = this.warrantyService.findOne(warrantyId);
 		Assert.notNull(result);
 	}
 
 	@Test
 	public void deleteWarrantyTest() {
 		this.authenticate(this.administratorService.findAll().iterator().next().getUserAccount().getUsername());
-		Warranty warranty = warrantyService.findDraftModeWarranties().iterator().next();
+		Warranty warranty = this.warrantyService.findDraftModeWarranties().iterator().next();
 		Assert.notNull(warranty);
 		Assert.isTrue(this.warrantyService.exists(warranty.getId()));
 		this.warrantyService.delete(warranty);
@@ -270,11 +269,11 @@ public class AdministratorServiceTest extends AbstractTest {
 		Category category, saved;
 		Collection<Category> categorys;
 		this.authenticate(this.administratorService.findAll().iterator().next().getUserAccount().getUsername());
-		category = categoryService.findAll().iterator().next();
+		category = this.categoryService.findAll().iterator().next();
 		category.setName("Test Name");
 		;
-		saved = categoryService.save(category);
-		categorys = categoryService.findAll();
+		saved = this.categoryService.save(category);
+		categorys = this.categoryService.findAll();
 		Assert.isTrue(categorys.contains(saved));
 	}
 
@@ -282,29 +281,29 @@ public class AdministratorServiceTest extends AbstractTest {
 	public void findAllCategoryTest() {
 		Collection<Category> result;
 		this.authenticate(this.administratorService.findAll().iterator().next().getUserAccount().getUsername());
-		result = categoryService.findAll();
+		result = this.categoryService.findAll();
 		Assert.notEmpty(result);
 	}
 
 	@Test
 	public void findOneCategoryTest() {
 		this.authenticate(this.administratorService.findAll().iterator().next().getUserAccount().getUsername());
-		Category category = categoryService.findAll().iterator().next();
-		Assert.isTrue(categoryService.exists(category.getId()));
+		Category category = this.categoryService.findAll().iterator().next();
+		Assert.isTrue(this.categoryService.exists(category.getId()));
 		Category result;
-		result = categoryService.findOne(category.getId());
+		result = this.categoryService.findOne(category.getId());
 		Assert.notNull(result);
 	}
 
 	@Test
 	public void deleteCategoryTest() {
 		this.authenticate(this.administratorService.findAll().iterator().next().getUserAccount().getUsername());
-		Category category = categoryService.findAll().iterator().next();
+		Category category = this.categoryService.findAll().iterator().next();
 		Assert.notNull(category);
 		Assert.isTrue(this.categoryService.exists(category.getId()));
 		this.categoryService.delete(category);
 	}
-	
+
 	@Test
 	public void saveRefereeTest() {
 		Referee created;
@@ -319,7 +318,7 @@ public class AdministratorServiceTest extends AbstractTest {
 		Assert.isTrue(this.refereeService.findAll().contains(saved));
 		Assert.isTrue(saved.getName().equals("Testreferee"));
 	}
-	
+
 	@Test
 	public void saveSponsorTest() {
 		Sponsor created;
@@ -337,19 +336,25 @@ public class AdministratorServiceTest extends AbstractTest {
 
 	@Test
 	public void saveConfigurationTest() {
-		Configuration res = configurationService.findAll().iterator().next();
+		Configuration res = this.configurationService.findAll().iterator().next();
 		Assert.isTrue(res.getId() != 0);
 		Assert.notNull(res);
 		res.getSpamWords().add("prueba");
-		Configuration saved = configurationService.save(res);
+		Configuration saved = this.configurationService.save(res);
 		Assert.isTrue(saved.getSpamWords().contains("prueba"));
 	}
-	
+
 	@Test
 	public void findAllSuspisiousActors() {
-		Collection<Actor> res = actorService.findAllSuspisiousActors();
+		Collection<Actor> res = this.actorService.findAllSuspisiousActors();
 		Assert.notNull(res);
-		
+
+	}
+
+	@Test
+	public void calculateScores() {
+		System.out.println(this.administratorService.calculateCustomerScore());
+		System.out.println(this.administratorService.calculateHandyWorkerScore());
 	}
 
 }
