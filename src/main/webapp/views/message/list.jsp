@@ -17,10 +17,10 @@
 <display:table pagesize="10" class="displaytag" name="messages"
 	requestURI="message/list.do" id="row2">
 
-	<display:column>
+	<%-- <display:column>
 		<a href="message/display.do?messageId=<jstl:out value="${row2.id}"/>"><spring:message
 				code="message.show" /></a>
-	</display:column>
+	</display:column> --%>
 	
 	<spring:message code="message.sender" var="senderHeader" />
 	<display:column title="${senderHeader}">
@@ -40,8 +40,8 @@
 </display:table>
 
 
-<a href="folder/create.do?folderId=${folder.id }"><spring:message
-		code="folder.newfolder" /></a>
+<%-- <a href="folder/create.do?folderId=${folder.id }"><spring:message
+		code="folder.newfolder" /></a> --%>
 		
 <%-- <jstl:if test="${folder.getSystemFolder() eq false }">
 
