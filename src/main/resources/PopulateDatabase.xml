@@ -161,7 +161,7 @@
 				<value>no</value>
 				<value>malo</value>
 				<value>mala</value>
-				<value>media</value>
+				<value>mediocre</value>
 				<value>desastre</value>
 			</list>
 		</property>
@@ -2775,7 +2775,7 @@
 
 	<bean id="endorsement0" class="domain.Endorsement">
 		<property name="moment" value="2018/01/10 8:30" />
-		<property name="comment" value="endorsementComment0" />
+		<property name="comment" value="bueno bueno bueno genial great amazing fantastic wonderful bueno" />
 		<property name="handyWorker" ref="handyWorker0" />
 		<property name="customer" ref="customer0">
 		</property>
@@ -2783,7 +2783,7 @@
 
 	<bean id="endorsement1" class="domain.Endorsement">
 		<property name="moment" value="2018/01/10 9:30" />
-		<property name="comment" value="endorsementComment1" />
+		<property name="comment" value="malo mala malo no not mediocre malo" />
 		<property name="handyWorker" ref="handyWorker1" />
 		<property name="customer" ref="customer1">
 		</property>
@@ -2791,7 +2791,7 @@
 
 	<bean id="endorsement2" class="domain.Endorsement">
 		<property name="moment" value="2018/01/10 10:30" />
-		<property name="comment" value="endorsementComment2" />
+		<property name="comment" value="bueno bueno bueno" />
 		<property name="handyWorker" ref="handyWorker2" />
 		<property name="customer" ref="customer2">
 		</property>
@@ -2799,7 +2799,7 @@
 
 	<bean id="endorsement3" class="domain.Endorsement">
 		<property name="moment" value="2018/01/10 11:30" />
-		<property name="comment" value="endorsementComment3" />
+		<property name="comment" value="malo malo malo malo" />
 		<property name="handyWorker" ref="handyWorker3" />
 		<property name="customer" ref="customer3">
 		</property>

@@ -15,8 +15,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import security.LoginService;
-import security.UserAccount;
 import services.AdministratorService;
 
 @Controller
@@ -53,11 +51,21 @@ public class AdministratorController extends AbstractController {
 		return result;
 	}
 	
-	@RequestMapping("/view")
+	@RequestMapping("/viewProfile")
 	public ModelAndView view() {
 		ModelAndView result;
 
-		result = new ModelAndView("administrator/view");
+		result = new ModelAndView("administrator/viewProfile");
+		result.addObject("actor", administratorservice.findSelf());
+
+		return result;
+	}
+	
+	@RequestMapping("/modifyProfile")
+	public ModelAndView modify() {
+		ModelAndView result;
+
+		result = new ModelAndView("administrator/modifyProfile");
 		result.addObject("actor", administratorservice.findSelf());
 
 		return result;
